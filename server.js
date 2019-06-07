@@ -38,7 +38,7 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
                 { value: JSON.stringify(data) }
             ]
         });
-    }, 2000);
+    }, 4000);
 })();
 
 (async () => {
@@ -47,7 +47,7 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const data = JSON.parse(message.value.toString());
-      console.log(knex.withSchema('salesforce').table('crowdstrike__c').insert(data).toString());
+      await knex.withSchema('salesforce').table('crowdstrike__c').insert(data);
     }
   })
 })();
