@@ -1,5 +1,12 @@
+process.env.DATABASE_URL += '?ssl=true';
+
 const faker = require('faker');
+const uuidv1 = require('uuid/v1');
 const { Kafka } = require('kafkajs');
+const knex = require('knex')({
+  client: 'postgres',
+  connection: process.env.DATABASE_URL
+});
 
 const kafka = new Kafka({
   clientId: 'crowdstrike',
@@ -19,7 +26,12 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
     await producer.connect();
     
     setInterval(async () => {
-        const data = { name: faker.name.findName(), email: faker.internet.email(), phone: faker.phone.phoneNumber() };
+        const data = {
+          external_id__c: uuidv1(),
+          name__c: faker.name.findName(),
+          email__c: faker.internet.email(),
+          phone__c: faker.phone.phoneNumber()
+        };
         await producer.send({
             topic: 'crowdstrike',
             messages: [
@@ -34,7 +46,8 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
   await consumer.subscribe({ topic: 'crowdstrike' });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      console.log(JSON.parse(message.value.toString()));
+      const data = JSON.parse(message.value.toString());
+      console.log(knex.withSchema('salesforce').table('crowdstrike__c').insert(data).toString());
     }
   })
 })();
