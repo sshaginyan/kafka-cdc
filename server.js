@@ -34,7 +34,7 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
   await consumer.subscribe({ topic: 'crowdstrike' });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      console.log(message.value.toString());
+      console.log(JSON.parse(message.value.toString()));
     }
   })
 })();
