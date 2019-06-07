@@ -27,3 +27,5 @@ const producer = kafka.producer();
         });
     }, 2000);
 })();
+
+require('http').createServer((req, res) => { res.end('ok'); }).listen(process.env.PORT);
