@@ -38,7 +38,7 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
                 { value: JSON.stringify(data) }
             ]
         });
-    }, 500);
+    }, 4000);
 })();
 
 (async () => {
