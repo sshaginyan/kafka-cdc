@@ -69,12 +69,14 @@ const consumer = kafka.consumer({ groupId: KAFKA_TOPIC_CDC });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const data = JSON.parse(message.value.toString());
-      connections.forEach( async socket => {
+      
+      const dataString = JSON.stringify(data);
+      const dataClone = JSON.parse(dataString);
+      delete dataClone.payload.ChangeEventHeader;
+      await knex.withSchema('public').table('accounts').insert({ cdc: JSON.stringify(dataClone.payload) });
+
+      connections.forEach(socket => {
         socket.emit('message', data);
-        const dataString = JSON.stringify(data);
-        const dataClone = JSON.parse(dataString);
-        delete dataClone.payload.ChangeEventHeader;
-        await knex.withSchema('public').table('accounts').insert({ cdc: JSON.stringify(dataClone.payload) });
       });
     }
   })
