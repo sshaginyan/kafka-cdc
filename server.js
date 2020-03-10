@@ -54,6 +54,7 @@ const consumer = kafka.consumer({ groupId: KAFKA_TOPIC_CDC });
     ]);
     await producer.connect();
     cdcStream.subscribe('/data/ChangeEvents', async data => {
+      console.log('=====PRODUCE=====');
       await producer.send({
           topic: KAFKA_TOPIC_CDC,
           messages: [
@@ -68,6 +69,7 @@ const consumer = kafka.consumer({ groupId: KAFKA_TOPIC_CDC });
   await consumer.subscribe({ topic: KAFKA_TOPIC_CDC });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
+      console.log('=====CONSUME=====');
       const data = JSON.parse(message.value.toString());
       
       const dataString = JSON.stringify(data);
