@@ -3,17 +3,17 @@
         <script src="socketio.js"></script>
         <script src="json-viewer.js"></script>
         <link rel="stylesheet" href="json-viewer.css">
-        <script>
-            const socket = io.connect('https://constellation-workshop.herokuapp.com/');
-            const jsonViewer = new JSONViewer();
-            document.querySelector('#json').appendChild(jsonViewer.getContainer());
-
-            socket.on('constellation', data => {
-                jsonViewer.showJSON(data, -1, 1);
-            });
-          </script>
     </header>
     <body>
         <div id="json"></div>
     </body>
+    <script>
+        const socket = io.connect('https://constellation-workshop.herokuapp.com/');
+        const jsonViewer = new JSONViewer();
+        document.querySelector('#json').appendChild(jsonViewer.getContainer());
+
+        socket.on('constellation', data => {
+            jsonViewer.showJSON(data, -1, 1);
+        });
+    </script>
 </html>
