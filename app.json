@@ -1,11 +1,16 @@
 {
+    "formation": {
+        "web": {
+            "quantity": 2,
+            "size": "standard-1x"
+        }
+    },
     "env": {
         "KAFKA_TOPIC_CDC": "kafka-cdc"
     },
     "addons": [
         {
-            "plan": "heroku-kafka:standard-0",
-            "as": "CDC-SFDC"
+            "plan": "heroku-kafka:standard-0"
         }
     ]
 }

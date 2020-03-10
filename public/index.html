@@ -10,7 +10,7 @@
     <script>
         const socket = io.connect('https://constellation-workshop.herokuapp.com/');
 
-        socket.on('constellation', data => {
+        socket.on('message', data => {
             const jsonViewer = new JSONViewer();
             const divEl = document.createElement('div');
             divEl.appendChild(jsonViewer.getContainer());

@@ -1,3 +1,5 @@
+process.env.DATABASE_URL += '?ssl=true';
+
 const jsforce = require('jsforce');
 const express = require('express');
 const { Kafka } = require('kafkajs');
@@ -5,6 +7,16 @@ const { Kafka } = require('kafkajs');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const knex = require('knex')({
+  client: 'postgres',
+  connection: process.env.DATABASE_URL
+});
+
+const {
+  SF_PASS,
+  SF_USER,
+  KAFKA_TOPIC_CDC
+} = process.env;
 
 app.use(express.static('public'));
 
@@ -32,19 +44,18 @@ const kafka = new Kafka({
 
 const conn = new jsforce.Connection();
 const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'crowdstrike' });
+const consumer = kafka.consumer({ groupId: KAFKA_TOPIC_CDC });
 
 (async () => {
-    await conn.login('heroku_pe_dev@herokudev.org', 'khCaOSvT#4eI1XC' + 'eP3QHn2n511AVGTLnHVn81IYC');
-
-    const cdcStream = conn.streaming.createClient([
+  await conn.login(SF_USER, SF_PASS);
+      const cdcStream = conn.streaming.createClient([
       new jsforce.StreamingExtension.Replay('/data/ChangeEvents', -1),
       new jsforce.StreamingExtension.AuthFailure(() => process.exit(1))
     ]);
     await producer.connect();
     cdcStream.subscribe('/data/ChangeEvents', async data => {
       await producer.send({
-          topic: 'crowdstrike',
+          topic: KAFKA_TOPIC_CDC,
           messages: [
               { value: JSON.stringify(data) }
           ]
@@ -54,12 +65,16 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
 
 (async () => {
   await consumer.connect();
-  await consumer.subscribe({ topic: 'crowdstrike' });
+  await consumer.subscribe({ topic: KAFKA_TOPIC_CDC });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const data = JSON.parse(message.value.toString());
       connections.forEach(socket => {
-        socket.emit('constellation', data);
+        socket.emit('message', data);
+        const dataString = JSON.stringify(data);
+        const dataClone = JSON.parse(data);
+        delete data.payload.ChangeEventHeader;
+        await knex.withSchema('public').table('accounts').insert({ changes: JSON.stringify(data.payload) });
       });
     }
   })
