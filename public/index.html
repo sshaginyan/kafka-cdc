@@ -1,14 +1,19 @@
 <html>
     <header>
         <script src="socketio.js"></script>
+        <script src="json-viewer.js"></script>
+        <link rel="stylesheet" href="json-viewer.css">
         <script>
-            var socket = io.connect('https://constellation-workshop.herokuapp.com/');
-            socket.on('constellation', function (data) {
-              console.log(data);
+            const socket = io.connect('https://constellation-workshop.herokuapp.com/');
+            const jsonViewer = new JSONViewer();
+            document.querySelector('#json').appendChild(jsonViewer.getContainer());
+
+            socket.on('constellation', data => {
+                jsonViewer.showJSON(data, -1, 1);
             });
           </script>
     </header>
     <body>
-
+        <div id="json"></div>
     </body>
 </html>
