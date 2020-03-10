@@ -69,7 +69,7 @@ const consumer = kafka.consumer({ groupId: KAFKA_TOPIC_CDC });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const data = JSON.parse(message.value.toString());
-      connections.forEach(socket => {
+      connections.forEach( async socket => {
         socket.emit('message', data);
         const dataString = JSON.stringify(data);
         const dataClone = JSON.parse(data);
