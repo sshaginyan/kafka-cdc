@@ -3,6 +3,22 @@ const express = require('express');
 const { Kafka } = require('kafkajs');
 
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
+app.use(express.static('public'));
+
+const connections = [];
+
+
+io.on('connection', async socket => {
+  connections.push(socket);
+  socket.on('disconnect', function() {
+      console.log('Got disconnect!');
+      const index = connections.indexOf(socket);
+      connections.splice(index, 1);
+   });
+});
 
 const kafka = new Kafka({
   clientId: 'crowdstrike',
@@ -43,9 +59,11 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const data = JSON.parse(message.value.toString());
-      console.log('CONSUMED======', data);
+      connections.forEach(socket => {
+        socket.emit('constellation', data);
+      });
     }
   })
 })();
 
-app.listen(process.env.PORT || 8080);
+server.listen(process.env.PORT || 8080);

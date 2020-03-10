@@ -1,0 +1,14 @@
+<html>
+    <header>
+        <script src="socketio.js"></script>
+        <script>
+            var socket = io.connect('https://constellation-workshop.herokuapp.com/');
+            socket.on('constellation', function (data) {
+              console.log(data);
+            });
+          </script>
+    </header>
+    <body>
+
+    </body>
+</html>
