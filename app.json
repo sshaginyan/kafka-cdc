@@ -1,0 +1,11 @@
+{
+    "env": {
+        "KAFKA_TOPIC_CDC": "kafka-cdc"
+    },
+    "addons": [
+        {
+            "plan": "heroku-kafka:standard-0",
+            "as": "CDC-SFDC"
+        }
+    ]
+}
