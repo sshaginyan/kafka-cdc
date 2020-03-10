@@ -32,7 +32,7 @@ io.on('connection', async socket => {
 });
 
 const kafka = new Kafka({
-  clientId: 'crowdstrike',
+  clientId: KAFKA_TOPIC_CDC,
   brokers: process.env.KAFKA_URL.replace(/kafka\+ssl:\/\//g, '').split(','),
   ssl: {
     rejectUnauthorized: false,
