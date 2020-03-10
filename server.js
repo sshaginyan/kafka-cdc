@@ -10,7 +10,6 @@ app.use(express.static('public'));
 
 const connections = [];
 
-
 io.on('connection', async socket => {
   connections.push(socket);
   socket.on('disconnect', function() {
