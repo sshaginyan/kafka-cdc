@@ -74,7 +74,7 @@ const consumer = kafka.consumer({ groupId: KAFKA_TOPIC_CDC });
         const dataString = JSON.stringify(data);
         const dataClone = JSON.parse(dataString);
         delete dataClone.payload.ChangeEventHeader;
-        await knex.withSchema('public').table('accounts').insert({ changes: JSON.stringify(dataClone.payload) });
+        await knex.withSchema('public').table('accounts').insert({ cdc: JSON.stringify(dataClone.payload) });
       });
     }
   })
