@@ -27,17 +27,15 @@ const consumer = kafka.consumer({ groupId: 'crowdstrike' });
       new jsforce.StreamingExtension.AuthFailure(() => process.exit(1))
     ]);
     await producer.connect();
-    
-    setInterval(async () => {
-      cdcStream.subscribe('/data/ChangeEvents', async data => {  
-        console.log('PRODUCED======', data);
-        await producer.send({
-            topic: 'crowdstrike',
-            messages: [
-                { value: JSON.stringify(data) }
-            ]
-        });
+    cdcStream.subscribe('/data/ChangeEvents', async data => {  
+      console.log('PRODUCED======', data);
+      await producer.send({
+          topic: 'crowdstrike',
+          messages: [
+              { value: JSON.stringify(data) }
+          ]
       });
+    });
 })();
 
 (async () => {
