@@ -72,12 +72,12 @@ const consumer = kafka.consumer({ groupId: KAFKA_TOPIC_CDC });
       connections.forEach(socket => {
         socket.emit('message', data);
       });
-      const dataString = JSON.stringify(data);
-      const dataClone = JSON.parse(dataString);
-      delete dataClone.payload.ChangeEventHeader;
-      await knex.withSchema('public').table('accounts').insert({ cdc: JSON.stringify(dataClone.payload) });
+      // const dataString = JSON.stringify(data);
+      // const dataClone = JSON.parse(dataString);
+      delete data.payload.ChangeEventHeader;
+      await knex.withSchema('public').table('accounts').insert({ cdc: JSON.stringify(data.payload) });
     }
-  })
+  });
 })();
 
 server.listen(process.env.PORT || 8080);
